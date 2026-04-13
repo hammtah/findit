@@ -1,0 +1,91 @@
+# ------------------------------
+# Global Node / JS dependencies
+# ------------------------------
+**/node_modules/
+
+# ------------------------------
+# Build / generated artifacts
+# ------------------------------
+**/dist/
+**/build/
+**/coverage/
+**/.nyc_output/
+**/*.tsbuildinfo
+
+# ------------------------------
+# Logs / runtime
+# ------------------------------
+logs/
+**/logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pids/
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ------------------------------
+# Environment files
+# ------------------------------
+.env
+.env.*
+!.env.example
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+**/.env
+**/.env.*
+**/.env*.local
+
+# ------------------------------
+# Temporary files
+# ------------------------------
+.temp/
+.tmp/
+
+# ------------------------------
+# Expo / React Native
+# ------------------------------
+**/.expo/
+**/web-build/
+expo-env.d.ts
+**/.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+.metro-health-check*
+
+# Generated native folders (Expo prebuild)
+findit-mobile/ios/
+findit-mobile/android/
+
+# ------------------------------
+# Editors / IDE
+# ------------------------------
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ------------------------------
+# OS
+# ------------------------------
+.DS_Store
