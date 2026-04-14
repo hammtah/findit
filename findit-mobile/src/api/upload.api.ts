@@ -1,9 +1,6 @@
-/**
- * Uploads an image to the server.
- * @param localUri The local URI of the image file to upload.
- * @returns A promise that resolves with the URL of the uploaded image.
- */
-export async function uploadImage(localUri: string): Promise<string> {
-  // TODO: To be implemented on Day 2
-  return '';
-}
+export interface UploadImageResponse { url: string }
+export interface UploadApi { uploadImage: (localUri: string) => Promise<UploadImageResponse> }
+
+export const uploadApi: UploadApi = {
+  uploadImage: async () => { throw new Error('uploadApi.uploadImage is not implemented yet.'); },
+};
