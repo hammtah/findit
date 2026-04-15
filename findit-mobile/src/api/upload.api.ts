@@ -4,7 +4,7 @@ export interface UploadImageResponse { url: string }
 export interface UploadApi { uploadImage: (localUri: string) => Promise<UploadImageResponse> }
 
 export const uploadApi: UploadApi = {
-  uploadImage: async (localUri: string): Promise<string> => {
+  uploadImage: async (localUri: string) => {
     const formData = new FormData();
     formData.append('file', {
       uri: localUri,
@@ -14,6 +14,6 @@ export const uploadApi: UploadApi = {
 
     const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
     const response = await axios.post(`${API_URL}/upload/image`, formData);
-    return response.data.url;
+    return { url: response.data.url };
   },
 };
