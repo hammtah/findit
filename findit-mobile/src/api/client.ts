@@ -1,9 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
-import { authApi } from './auth.api';
 import { navigateToLogin } from '../navigation/navigationRef';
-import { useAuthStore } from '../store/auth.store';
-import { getAccessToken, getRefreshToken, setTokens } from '../utils/tokenStorage';
+import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '../utils/tokenStorage';
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 type QueueItem = { resolve: (token: string) => void; reject: (error: unknown) => void };
@@ -11,6 +9,11 @@ type QueueItem = { resolve: (token: string) => void; reject: (error: unknown) =>
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
+const refreshClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  headers: { 'Content-Type': 'application/json' },
+});
 
 function processQueue(error: unknown, token: string | null = null): void {
   failedQueue.forEach((item) => (error ? item.reject(error) : item.resolve(token ?? '')));
@@ -55,7 +58,11 @@ apiClient.interceptors.response.use(
       const refreshToken = await getRefreshToken();
       if (!refreshToken) throw new Error('Missing refresh token');
 
-      const refreshed = await authApi.refresh(refreshToken);
+      const refreshed = (
+        await refreshClient.post<{ access_token: string; refresh_token: string }>('/auth/refresh', {
+          refresh_token: refreshToken,
+        })
+      ).data;
       await setTokens(refreshed.access_token, refreshed.refresh_token);
       processQueue(null, refreshed.access_token);
 
@@ -63,7 +70,7 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest as AxiosRequestConfig);
     } catch (refreshError) {
       processQueue(refreshError, null);
-      await useAuthStore.getState().logout(true);
+      await clearTokens();
       navigateToLogin();
       return Promise.reject(refreshError);
     } finally {
