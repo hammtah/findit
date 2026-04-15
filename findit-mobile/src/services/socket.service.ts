@@ -1,21 +1,13 @@
 import { io, Socket } from 'socket.io-client';
-import mitt, { Emitter } from 'mitt';
-
-// Create a type for our events
-type SocketEvents = {
-  isConnected: boolean;
-};
+import { useChatStore } from '../store/chat.store';
+import { useAuthStore } from '../store/auth.store';
 
 class SocketService {
   private static instance: SocketService;
   private socket: Socket | null = null;
   public isConnected = false;
-  private eventEmitter: Emitter<SocketEvents>;
 
-  private constructor() {
-    // Private constructor to prevent direct instantiation
-    this.eventEmitter = mitt<SocketEvents>();
-  }
+  private constructor() {}
 
   public static getInstance(): SocketService {
     if (!SocketService.instance) {
@@ -24,20 +16,9 @@ class SocketService {
     return SocketService.instance;
   }
 
-  public on<Key extends keyof SocketEvents>(type: Key, handler: (event: SocketEvents[Key]) => void) {
-    this.eventEmitter.on(type, handler);
-  }
-
-  public off<Key extends keyof SocketEvents>(type: Key, handler: (event: SocketEvents[Key]) => void) {
-    this.eventEmitter.off(type, handler);
-  }
-
   public connect(token: string): void {
-    if (this.socket?.connected) {
-      return;
-    }
+    if (this.socket?.connected) return;
 
-    // Ensure any old socket is disconnected before creating a new one
     if (this.socket) {
       this.socket.disconnect();
     }
@@ -48,89 +29,96 @@ class SocketService {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
-      auth: {
-        token,
-      },
+      auth: { token },
     });
 
     this.socket.on('connect', () => {
       this.isConnected = true;
-      this.eventEmitter.emit('isConnected', true);
-      console.log('Socket connected!');
+      console.log('Socket connected');
+      // Enregistrer les listeners après la connexion
+      this.registerEventListeners();
     });
 
     this.socket.on('disconnect', () => {
       this.isConnected = false;
-      this.eventEmitter.emit('isConnected', false);
-      console.log('Socket disconnected!');
+      console.log('Socket disconnected');
     });
+  }
+
+  private registerEventListeners(): void {
+    if (!this.socket) return;
+
+    // Supprimer les anciens listeners pour éviter les doublons
+    this.socket.off('new_message');
+    this.socket.off('message_read');
+    this.socket.off('conversation_updated');
+    this.socket.off('error');
+
+    const chatStore = useChatStore.getState();
+
+    this.socket.on('new_message', (message) => {
+      chatStore.addMessage(message);
+    });
+
+    this.socket.on('message_read', (data: { conversationId: string; readerId: string }) => {
+      chatStore.markConversationRead(data.conversationId, data.readerId);
+    });
+
+    this.socket.on('conversation_updated', (conversation) => {
+      chatStore.updateConversation(conversation);
+    });
+
+this.socket.on('error', async (error: { code: string; message: string }) => {
+  if (error?.code === 'UNAUTHORIZED') {
+    try {
+      const authStore = useAuthStore.getState();
+      await authStore.loadFromStorage();
+
+      const { getAccessToken } = await import('../utils/tokenStorage');
+      const newToken = await getAccessToken();
+
+      if (newToken) {
+        this.disconnect();
+        this.connect(newToken);
+      } else {
+        await authStore.logout(true);
+      }
+    } catch (e) {
+      console.error('Refresh échoué, déconnexion', e);
+      await useAuthStore.getState().logout(true);
+    }
+  } else {
+    console.error('Socket error:', error);
+  }
+});
   }
 
   public disconnect(): void {
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.disconnect();
       this.socket = null;
       this.isConnected = false;
-      this.eventEmitter.emit('isConnected', false);
     }
   }
 
   public joinConversation(conversationId: string): void {
-    if (this.socket && this.isConnected) {
-      this.socket.emit('join_conversation', { conversationId });
-    }
+    this.socket?.emit('join_conversation', { conversationId });
   }
 
   public leaveConversation(conversationId: string): void {
-    if (this.socket && this.isConnected) {
-      this.socket.emit('leave_conversation', { conversationId });
-    }
+    this.socket?.emit('leave_conversation', { conversationId });
   }
 
-  public sendMessage(conversationId: string, content: string, photoUrl?: string): void {
-    if (this.socket && this.isConnected) {
-      this.socket.emit('send_message', {
-        conversationId,
-        content,
-        photoUrl,
-      });
-    }
+  public sendMessage(conversationId: string, contenu: string, photoUrl?: string): void {
+    this.socket?.emit('send_message', { conversationId, contenu, photoUrl });
   }
 
-  public markRead(conversationId: string, messageId: string): void {
-    if (this.socket && this.isConnected) {
-      this.socket.emit('mark_read', {
-        conversationId,
-        messageId,
-      });
-    }
-  }
-
-  public registerEventListeners(chatStore: any) {
-    if (!this.socket) return;
-
-    this.socket.on('new_message', (message: any) => {
-      chatStore.addMessage(message);
-    });
-
-    this.socket.on('message_read', (data: any) => {
-      chatStore.markConversationRead(data.conversationId, data.messageId);
-    });
-
-    this.socket.on('conversation_updated', (conversation: any) => {
-      chatStore.updateConversation(conversation);
-    });
-
-    this.socket.on('error', async (error: any) => {
-      if (error?.code === 'UNAUTHORIZED') {
-        // Ici, il faudrait rafraîchir le token (ex: via authStore ou une fonction dédiée)
-        // await refreshToken();
-        // Puis reconnecter le socket avec le nouveau token
-      } else {
-        console.error('Socket error:', error);
-      }
-    });
+  public markRead(conversationId: string): void {
+    this.socket?.emit('mark_read', { conversationId });
   }
 }
+
+export const socketService = SocketService.getInstance();
 
 export default SocketService.getInstance();
