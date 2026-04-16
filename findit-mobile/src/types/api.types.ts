@@ -36,6 +36,8 @@ export interface ConversationSummary {
   participants: User[];
   report: Pick<ReportSummary, 'id' | 'title'>;
   updatedAt: Date;
+  statut?: string; 
+  unread_count?: number; 
 }
 
 export interface Message {
