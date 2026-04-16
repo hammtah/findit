@@ -93,7 +93,9 @@ export class AuthService {
     return { message: 'Verification email sent' };
   }
 
-  async resendVerificationEmail(emailInput: string): Promise<{ message: string }> {
+  async resendVerificationEmail(
+    emailInput: string,
+  ): Promise<{ message: string }> {
     const email = emailInput.toLowerCase().trim();
     const user = await this.usersRepository.findOne({ where: { email } });
 

@@ -58,13 +58,13 @@ export class Report {
   description: string;
 
   @Column({ type: 'enum', enum: ReportCategorie, nullable: true })
-  categorie: ReportCategorie;
+  categorie: ReportCategorie | null;
 
   @Column({ type: 'date' })
   date_evenement: string;
 
   @Column({ type: 'time', nullable: true })
-  heure_evenement: string;
+  heure_evenement: string | null;
 
   @Column({ type: 'varchar' })
   adresse: string;
@@ -76,7 +76,7 @@ export class Report {
     srid: 4326,
     nullable: true,
   })
-  location: object;
+  location: object | null;
 
   @Column({ type: 'text', array: true, default: '{}' })
   photos: string[];

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration, { validationSchema } from './config/configuration';
 import { AuthModule } from './modules/auth/auth.module';
@@ -20,6 +21,7 @@ import { UsersModule } from './modules/users/users.module';
       load: [configuration],
       validationSchema,
     }),
+    EventEmitterModule.forRoot(),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
