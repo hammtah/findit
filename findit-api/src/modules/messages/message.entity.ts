@@ -34,7 +34,7 @@ export class Message {
   contenu: string;
 
   @Column({ type: 'varchar', nullable: true })
-  photo_url: string;
+  photo_url: string | null;
 
   @Column({ type: 'boolean', default: false })
   is_read: boolean;
