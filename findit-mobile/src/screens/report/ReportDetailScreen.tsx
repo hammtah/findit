@@ -377,7 +377,11 @@ export function ReportDetailScreen({ route, navigation }: any) {
                 title="Modifier"
                 variant="secondary"
                 containerStyle={styles.actionButton}
-                onPress={() => navigation.navigate(ROUTES.CREATE_REPORT)}
+                onPress={() =>
+                  navigation.navigate(ROUTES.CREATE_REPORT, {
+                    reportId: report.id,
+                  })
+                }
               />
               <Button
                 title={

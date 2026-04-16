@@ -9,14 +9,16 @@ export type AuthStackParamList = {
 };
 
 export type FeedStackParamList = {
-  [ROUTES.FEED]: undefined;
+  [ROUTES.FEED_HOME]: undefined;
   [ROUTES.REPORT_DETAIL]: { reportId: string };
   [ROUTES.USER_PUBLIC_PROFILE]: { userId: string } | undefined;
 };
 
 export type AppTabParamList = {
   [ROUTES.FEED]: undefined;
-  [ROUTES.CREATE_REPORT]: undefined;
+  [ROUTES.CREATE_REPORT]:
+    | { type?: 'lost' | 'found'; reportId?: string }
+    | undefined;
   [ROUTES.CONVERSATIONS]: undefined;
   [ROUTES.PROFILE]: undefined;
 };

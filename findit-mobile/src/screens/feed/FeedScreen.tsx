@@ -6,11 +6,11 @@ import {
   FlatList,
   Modal,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '../../components/shared/Button';
 import { EmptyState } from '../../components/shared/EmptyState';
@@ -27,7 +27,7 @@ import { FilterSheet } from './FilterSheet';
 
 const LOCATION_FLAG_KEY = 'location_permission_asked';
 
-export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FEED>) {
+export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FEED_HOME>) {
   const filters = useFiltersStore();
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [showLocationExplainer, setShowLocationExplainer] = useState(false);
