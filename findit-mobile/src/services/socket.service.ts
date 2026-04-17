@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { API_BASE_URL } from '../config/api';
 import { useChatStore } from '../store/chat.store';
 import { useAuthStore } from '../store/auth.store';
 
@@ -23,9 +24,7 @@ class SocketService {
       this.socket.disconnect();
     }
 
-    const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
-
-    this.socket = io(`${API_URL}/chat`, {
+  this.socket = io(`${API_BASE_URL}/chat`, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,

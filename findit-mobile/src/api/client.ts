@@ -1,12 +1,12 @@
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
+import { API_BASE_URL } from '../config/api';
 import { navigateToLogin } from '../navigation/navigationRef';
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '../utils/tokenStorage';
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 type QueueItem = { resolve: (token: string) => void; reject: (error: unknown) => void };
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
 const refreshClient = axios.create({

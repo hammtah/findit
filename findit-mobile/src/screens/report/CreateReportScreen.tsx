@@ -216,6 +216,27 @@ export function CreateReportScreen({ route, navigation }: any) {
   }, []);
 
   const reverseGeocode = useCallback(async (lat: number, lon: number) => {
+    const nativeResults = await Location.reverseGeocodeAsync({
+      latitude: lat,
+      longitude: lon,
+    });
+
+    const nativeAddress = nativeResults[0];
+    if (nativeAddress) {
+      const parts = [
+        nativeAddress.name,
+        nativeAddress.street,
+        nativeAddress.postalCode,
+        nativeAddress.city,
+        nativeAddress.region,
+        nativeAddress.country,
+      ].filter((part): part is string => Boolean(part && part.trim()));
+
+      if (parts.length > 0) {
+        return parts.join(', ');
+      }
+    }
+
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
     const response = await fetch(url, {
       headers: {
@@ -232,6 +253,22 @@ export function CreateReportScreen({ route, navigation }: any) {
     return data.display_name;
   }, []);
 
+  const getLocationErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) {
+      if (error.message === 'LOCATION_TIMEOUT') {
+        return 'La localisation a pris trop de temps. Réessayez dans un endroit avec un meilleur signal GPS.';
+      }
+      if (
+        error.message.toLowerCase().includes('location services') ||
+        error.message.toLowerCase().includes('location provider')
+      ) {
+        return 'Activez la localisation (GPS) dans les paramètres de votre téléphone puis réessayez.';
+      }
+    }
+
+    return "Impossible de récupérer votre position actuelle. Vérifiez vos permissions et le GPS.";
+  };
+
   const handleUseCurrentPosition = async () => {
     setIsResolvingAddress(true);
     setSubmitError(null);
@@ -242,18 +279,41 @@ export function CreateReportScreen({ route, navigation }: any) {
         return;
       }
 
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
+      const isLocationEnabled = await Location.hasServicesEnabledAsync();
+      if (!isLocationEnabled) {
+        setSubmitError('Activez la localisation (GPS) dans les paramètres de votre téléphone puis réessayez.');
+        return;
+      }
+
+      const position = await Promise.race([
+        Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        }),
+        new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('LOCATION_TIMEOUT')), 12000);
+        }),
+      ]).catch(async (error) => {
+        const lastKnown = await Location.getLastKnownPositionAsync();
+        if (lastKnown) return lastKnown;
+        throw error;
       });
+
       const nextLatitude = position.coords.latitude;
       const nextLongitude = position.coords.longitude;
-      const resolvedAddress = await reverseGeocode(nextLatitude, nextLongitude);
 
       setValue('latitude', nextLatitude, { shouldValidate: true });
       setValue('longitude', nextLongitude, { shouldValidate: true });
-      setValue('adresse', resolvedAddress, { shouldValidate: true });
+
+      try {
+        const resolvedAddress = await reverseGeocode(nextLatitude, nextLongitude);
+        setValue('adresse', resolvedAddress, { shouldValidate: true });
+      } catch {
+        setValue('adresse', `${nextLatitude.toFixed(6)}, ${nextLongitude.toFixed(6)}`, {
+          shouldValidate: true,
+        });
+      }
     } catch (err) {
-      setSubmitError(handleApiError(err));
+      setSubmitError(getLocationErrorMessage(err));
     } finally {
       setIsResolvingAddress(false);
     }
@@ -375,8 +435,9 @@ export function CreateReportScreen({ route, navigation }: any) {
         ? await reportsApi.updateReport<{ id: string }>(reportId, payload)
         : await reportsApi.createReport<{ id: string }>(payload);
 
-      navigation.navigate(ROUTES.REPORT_DETAIL, {
-        reportId: response.id ?? reportId,
+      navigation.navigate(ROUTES.FEED, {
+        screen: ROUTES.REPORT_DETAIL,
+        params: { reportId: response.id ?? reportId },
       });
     } catch (err) {
       mapApiErrors(handleApiError(err));

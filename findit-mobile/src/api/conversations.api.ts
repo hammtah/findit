@@ -3,11 +3,15 @@ import { apiClient } from './client';
 import { ConversationSummary, Message } from '../types/api.types';
 
 const unwrap = <T>(raw: unknown): T => (raw && typeof raw === 'object' && (raw as any).data ? (raw as any).data : raw) as T;
+type CreateConversationPayload = {
+  report_lost_id: string;
+  report_found_id: string;
+};
 
 export const conversationsApi = {
 
-  createConversation: async (reportId: string): Promise<{ id: string }> =>
-    (await apiClient.post<{ id: string }>('/conversations', { report_id: reportId })).data,
+  createConversation: async (payload: CreateConversationPayload): Promise<{ id: string }> =>
+    (await apiClient.post<{ id: string }>('/conversations', payload)).data,
 
   getAll: async (): Promise<ConversationSummary[]> => {
     const res = await apiClient.get('/conversations');

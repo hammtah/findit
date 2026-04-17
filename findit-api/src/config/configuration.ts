@@ -16,9 +16,6 @@ export const validationSchema = Joi.object({
   GOOGLE_CLIENT_SECRET: Joi.string().required(),
   GOOGLE_CALLBACK_URL: Joi.string().uri().required(),
 
-  RESEND_API_KEY: Joi.string().required(),
-  EMAIL_FROM: Joi.string().email().required(),
-
   FRONTEND_URL: Joi.string().required(),
 
   CLOUDINARY_CLOUD_NAME: Joi.string().required(),
@@ -48,10 +45,6 @@ export default () => ({
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,
     apiSecret: process.env.CLOUDINARY_API_SECRET,
-  },
-  resend: {
-    apiKey: process.env.RESEND_API_KEY,
-    from: process.env.EMAIL_FROM,
   },
   app: {
     frontendUrl: process.env.FRONTEND_URL,

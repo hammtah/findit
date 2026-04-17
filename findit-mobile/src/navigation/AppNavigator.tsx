@@ -32,8 +32,8 @@ function FeedStackNavigator() {
 
 function ConversationsStackNavigator() {
   return (
-    <ConversationsStack.Navigator initialRouteName={ROUTES.CONVERSATIONS} screenOptions={{ headerShown: false }}>
-      <ConversationsStack.Screen name={ROUTES.CONVERSATIONS} component={ConversationsListScreen} />
+    <ConversationsStack.Navigator initialRouteName={ROUTES.CONVERSATIONS_LIST} screenOptions={{ headerShown: false }}>
+      <ConversationsStack.Screen name={ROUTES.CONVERSATIONS_LIST} component={ConversationsListScreen} />
       <ConversationsStack.Screen name={ROUTES.CHAT} component={ChatScreen} />
     </ConversationsStack.Navigator>
   );

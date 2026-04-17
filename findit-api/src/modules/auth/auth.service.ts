@@ -1,10 +1,7 @@
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
-  InternalServerErrorException,
   Injectable,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,10 +12,7 @@ import { createPublicKey } from 'crypto';
 import { v4 as uuid } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { decode as decodeJwt } from 'jsonwebtoken';
-import { Resend } from 'resend';
 import { User, AuthProvider } from '../users/user.entity';
-import { EmailVerification } from './email-verification.entity';
-import { PasswordReset } from './password-reset.entity';
 import { RefreshToken } from './refresh-token.entity';
 import {
   AccessTokenPayload,
@@ -33,30 +27,18 @@ import {
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AppleCallbackDto } from './dto/apple-callback.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-  private readonly resend: Resend;
-
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    @InjectRepository(EmailVerification)
-    private readonly emailVerificationRepository: Repository<EmailVerification>,
-    @InjectRepository(PasswordReset)
-    private readonly passwordResetRepository: Repository<PasswordReset>,
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {
-    const resendApiKey = this.configService.get<string>('resend.apiKey') ?? '';
-    this.resend = new Resend(resendApiKey);
-  }
+  ) {}
 
   async register(dto: RegisterDto): Promise<{ message: string }> {
     const email = dto.email.toLowerCase().trim();
@@ -64,77 +46,23 @@ export class AuthService {
 
     const existing = await this.usersRepository.findOne({ where: { email } });
     if (existing) {
-      if (
-        existing.provider === AuthProvider.EMAIL &&
-        existing.email_verified === false
-      ) {
-        await this.issueAndSendEmailVerification(existing);
-        return { message: 'Verification email sent' };
-      }
-
       throw new ConflictException({ code: 'EMAIL_ALREADY_EXISTS' });
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    const user = await this.usersRepository.save(
+    await this.usersRepository.save(
       this.usersRepository.create({
         email,
         nom,
         password_hash: passwordHash,
         provider: AuthProvider.EMAIL,
-        email_verified: false,
-        is_active: false,
+        email_verified: true,
+        is_active: true,
       }),
     );
 
-    await this.issueAndSendEmailVerification(user);
-
-    return { message: 'Verification email sent' };
-  }
-
-  async resendVerificationEmail(
-    emailInput: string,
-  ): Promise<{ message: string }> {
-    const email = emailInput.toLowerCase().trim();
-    const user = await this.usersRepository.findOne({ where: { email } });
-
-    if (
-      user &&
-      user.provider === AuthProvider.EMAIL &&
-      user.email_verified === false
-    ) {
-      await this.issueAndSendEmailVerification(user);
-    }
-
-    return { message: 'If account exists, verification email sent' };
-  }
-
-  async verifyEmail(token: string): Promise<AuthResponse> {
-    const verification = await this.emailVerificationRepository
-      .createQueryBuilder('verification')
-      .leftJoinAndSelect('verification.user', 'user')
-      .where('verification.token = :token', { token })
-      .andWhere('verification.used = false')
-      .andWhere('verification.expires_at > :now', { now: new Date() })
-      .getOne();
-
-    if (!verification?.user) {
-      throw new BadRequestException({ code: 'INVALID_OR_EXPIRED_TOKEN' });
-    }
-
-    verification.used = true;
-    await this.emailVerificationRepository.save(verification);
-
-    verification.user.email_verified = true;
-    verification.user.is_active = true;
-    const user = await this.usersRepository.save(verification.user);
-
-    const tokens = await this.generateTokens(user.id);
-    return {
-      ...tokens,
-      user: this.serializeUser(user),
-    };
+    return { message: 'Account created successfully' };
   }
 
   async login(dto: LoginDto): Promise<AuthResponse> {
@@ -194,57 +122,6 @@ export class AuthService {
     }
 
     return { message: 'Logged out' };
-  }
-
-  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
-    const email = dto.email.toLowerCase().trim();
-    const user = await this.usersRepository.findOne({ where: { email } });
-
-    if (user && user.email_verified) {
-      const token = uuid();
-      await this.passwordResetRepository.save(
-        this.passwordResetRepository.create({
-          user_id: user.id,
-          token,
-          expires_at: new Date(Date.now() + 60 * 60 * 1000),
-          used: false,
-        }),
-      );
-
-      await this.sendPasswordResetEmail(user.email, token);
-    }
-
-    return { message: 'If account exists, reset instructions were sent' };
-  }
-
-  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
-    const resetRecord = await this.passwordResetRepository
-      .createQueryBuilder('reset')
-      .leftJoinAndSelect('reset.user', 'user')
-      .where('reset.token = :token', { token: dto.token })
-      .andWhere('reset.used = false')
-      .andWhere('reset.expires_at > :now', { now: new Date() })
-      .getOne();
-
-    if (!resetRecord?.user) {
-      throw new BadRequestException({ code: 'INVALID_OR_EXPIRED_TOKEN' });
-    }
-
-    resetRecord.user.password_hash = await bcrypt.hash(dto.new_password, 12);
-    await this.usersRepository.save(resetRecord.user);
-
-    resetRecord.used = true;
-    await this.passwordResetRepository.save(resetRecord);
-
-    await this.refreshTokenRepository
-      .createQueryBuilder()
-      .update(RefreshToken)
-      .set({ revoked: true })
-      .where('user_id = :userId', { userId: resetRecord.user.id })
-      .andWhere('revoked = false')
-      .execute();
-
-    return { message: 'Password reset successful' };
   }
 
   async handleGoogleCallback(
@@ -494,83 +371,6 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException({ code: 'INVALID_APPLE_TOKEN' });
     }
-  }
-
-  private async sendVerificationEmail(
-    email: string,
-    token: string,
-  ): Promise<void> {
-    const frontendUrl = this.configService.get<string>('app.frontendUrl') ?? '';
-    const from = this.configService.get<string>('resend.from') ?? '';
-    const link = `${frontendUrl}/verify-email?token=${encodeURIComponent(token)}`;
-
-    const { data, error } = await this.resend.emails.send({
-      from,
-      to: email,
-      subject: 'Vérifie ton email',
-      html: `<p>Bienvenue</p><p>Clique sur ce lien pour vérifier ton email :</p><p><a href="${link}">${link}</a></p>`,
-    });
-
-    if (error) {
-      this.logger.error(
-        `Resend verification email failed for ${email}: ${JSON.stringify(error)}`,
-      );
-      throw new InternalServerErrorException({ code: 'EMAIL_SEND_FAILED' });
-    }
-
-    this.logger.log(
-      `Verification email queued for ${email} (id: ${data?.id ?? 'n/a'})`,
-    );
-  }
-
-  private async issueAndSendEmailVerification(user: User): Promise<void> {
-    const token = uuid();
-
-    await this.emailVerificationRepository
-      .createQueryBuilder()
-      .update(EmailVerification)
-      .set({ used: true })
-      .where('user_id = :userId', { userId: user.id })
-      .andWhere('used = false')
-      .execute();
-
-    await this.emailVerificationRepository.save(
-      this.emailVerificationRepository.create({
-        user_id: user.id,
-        token,
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        used: false,
-      }),
-    );
-
-    await this.sendVerificationEmail(user.email, token);
-  }
-
-  private async sendPasswordResetEmail(
-    email: string,
-    token: string,
-  ): Promise<void> {
-    const frontendUrl = this.configService.get<string>('app.frontendUrl') ?? '';
-    const from = this.configService.get<string>('resend.from') ?? '';
-    const link = `${frontendUrl}/reset-password?token=${encodeURIComponent(token)}`;
-
-    const { data, error } = await this.resend.emails.send({
-      from,
-      to: email,
-      subject: 'Réinitialisation du mot de passe',
-      html: `<p>Tu as demandé une réinitialisation de mot de passe.</p><p><a href="${link}">Réinitialiser mon mot de passe</a></p>`,
-    });
-
-    if (error) {
-      this.logger.error(
-        `Resend password reset email failed for ${email}: ${JSON.stringify(error)}`,
-      );
-      throw new InternalServerErrorException({ code: 'EMAIL_SEND_FAILED' });
-    }
-
-    this.logger.log(
-      `Password reset email queued for ${email} (id: ${data?.id ?? 'n/a'})`,
-    );
   }
 
   private serializeUser(user: User): SerializedAuthUser {

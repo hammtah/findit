@@ -80,8 +80,6 @@ function GoogleOAuthButton({
 export function LoginScreen({ navigation }: Props) {
   const login = useAuthStore((state) => state.login);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
-  const [isSendingVerification, setIsSendingVerification] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const googleAndroidClientId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
   const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
@@ -96,7 +94,6 @@ export function LoginScreen({ navigation }: Props) {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-    getValues,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '' },
@@ -105,7 +102,6 @@ export function LoginScreen({ navigation }: Props) {
   const onSubmit = handleSubmit(async (values) => {
     try {
       setSubmitError(null);
-      setUnverifiedEmail(null);
       const response = await authApi.login(values);
       await login(response);
     } catch (error) {
@@ -113,11 +109,6 @@ export function LoginScreen({ navigation }: Props) {
       const status = axiosError.response?.status;
       const code = axiosError.response?.data?.code;
 
-      if (status === 403 && code === 'EMAIL_NOT_VERIFIED') {
-        setSubmitError("Votre email n'est pas encore verifie.");
-        setUnverifiedEmail(values.email);
-        return;
-      }
       if (status === 403 && code === 'ACCOUNT_SUSPENDED') {
         setSubmitError('Votre compte est suspendu. Contactez le support.');
         return;
@@ -129,21 +120,6 @@ export function LoginScreen({ navigation }: Props) {
       setSubmitError('Impossible de se connecter pour le moment.');
     }
   });
-
-  const resendVerificationEmail = async () => {
-    const email = unverifiedEmail ?? getValues('email');
-    if (!email) return;
-
-    try {
-      setIsSendingVerification(true);
-      await authApi.resendVerificationEmail(email);
-      setSubmitError(`Email de verification renvoye a ${email}.`);
-    } catch {
-      setSubmitError("Impossible de renvoyer l'email de verification.");
-    } finally {
-      setIsSendingVerification(false);
-    }
-  };
 
   const handleApplePress = async () => {
     try {
@@ -208,17 +184,7 @@ export function LoginScreen({ navigation }: Props) {
         />
 
         {submitError ? <Text style={styles.errorText}>{submitError}</Text> : null}
-        {unverifiedEmail ? (
-          <Pressable onPress={resendVerificationEmail} disabled={isSendingVerification}>
-            <Text style={styles.link}>{isSendingVerification ? 'Envoi en cours...' : "Renvoyer l'email de verification"}</Text>
-          </Pressable>
-        ) : null}
-
         <Button title="Se connecter" onPress={onSubmit} disabled={isBusy} />
-
-        <Pressable onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}>
-          <Text style={styles.link}>Mot de passe oublie ?</Text>
-        </Pressable>
       </View>
 
       <View style={styles.footer}>

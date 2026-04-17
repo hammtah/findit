@@ -54,11 +54,15 @@ export function RegisterScreen({ navigation }: Props) {
         email: values.email,
         password: values.password,
       });
-      navigation.navigate(ROUTES.VERIFY_EMAIL, { email: values.email });
+      navigation.navigate(ROUTES.LOGIN);
     } catch (error) {
       const axiosError = error as AxiosError<ApiErrorPayload>;
       if (axiosError.response?.status === 409 && axiosError.response.data?.code === 'EMAIL_ALREADY_EXISTS') {
         setSubmitError('Cet email est deja utilise.');
+        return;
+      }
+      if (axiosError.code === 'ECONNABORTED' || axiosError.message === 'Network Error') {
+        setSubmitError("Connexion au serveur impossible. Verifie l'URL API et que le backend est demarre.");
         return;
       }
       setSubmitError('Impossible de creer votre compte.');

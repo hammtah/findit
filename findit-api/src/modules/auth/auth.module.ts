@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EmailVerification } from './email-verification.entity';
-import { PasswordReset } from './password-reset.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { User } from '../users/user.entity';
 import { AuthController } from './auth.controller';
@@ -16,12 +14,7 @@ import { WsJwtGuard } from './guards/ws-jwt.guard';
   imports: [
     PassportModule.register({ session: false }),
     JwtModule.register({}),
-    TypeOrmModule.forFeature([
-      User,
-      EmailVerification,
-      PasswordReset,
-      RefreshToken,
-    ]),
+    TypeOrmModule.forFeature([User, RefreshToken]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, GoogleStrategy, WsJwtGuard],
