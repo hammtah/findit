@@ -16,4 +16,6 @@ export const reportsApi = {
   deleteReport: async (id: string): Promise<void> => {
     await apiClient.delete(`/reports/${id}`);
   },
+  getReportMatches: async <T = unknown>(id: string): Promise<T> =>
+    (await apiClient.get<T>(`/reports/${id}/matches`)).data,
 };

@@ -7,7 +7,7 @@ import { borderRadius, colors, spacing, typography } from '../../constants/theme
 import { ROUTES } from '../../navigation/routes';
 import { AuthStackParamList } from '../../navigation/types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.REGISTER>;
+type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.FORGOT_PASSWORD>;
 
 export function ForgotPasswordScreen({ navigation }: Props) {
   const [confirmation, setConfirmation] = useState<string | null>(null);

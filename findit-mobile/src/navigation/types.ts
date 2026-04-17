@@ -5,6 +5,9 @@ import { ROUTES } from './routes';
 export type AuthStackParamList = {
   [ROUTES.LOGIN]: undefined;
   [ROUTES.REGISTER]: undefined;
+  [ROUTES.VERIFY_EMAIL]: { email?: string } | undefined;
+  [ROUTES.FORGOT_PASSWORD]: undefined;
+  [ROUTES.RESET_PASSWORD]: { token?: string } | undefined;
 };
 
 export type FeedStackParamList = {

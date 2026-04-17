@@ -1,7 +1,6 @@
 import { Image } from 'expo-image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   FlatList,
   Modal,
@@ -20,7 +19,9 @@ import { MatchCard } from '../../components/report/MatchCard';
 import { Avatar } from '../../components/shared/Avatar';
 import { Badge } from '../../components/shared/Badge';
 import { Button } from '../../components/shared/Button';
+import { EmptyState } from '../../components/shared/EmptyState';
 import { ErrorMessage } from '../../components/shared/ErrorMessage';
+import { SkeletonBlock } from '../../components/shared/SkeletonBlock';
 import { StarRating } from '../../components/shared/StarRating';
 import { borderRadius, colors, spacing, typography } from '../../constants/theme';
 import { ROUTES } from '../../navigation/routes';
@@ -245,8 +246,19 @@ export function ReportDetailScreen({ route, navigation }: any) {
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={styles.skeletonRoot}>
+        <SkeletonBlock style={styles.skeletonGallery} />
+        <View style={styles.skeletonSection}>
+          <SkeletonBlock style={styles.skeletonBadgeRow} />
+          <SkeletonBlock style={styles.skeletonMainTitle} />
+          <SkeletonBlock style={styles.skeletonLineLong} />
+          <SkeletonBlock style={styles.skeletonLineLong} />
+          <SkeletonBlock style={styles.skeletonParagraph} />
+        </View>
+        <View style={styles.skeletonSection}>
+          <SkeletonBlock style={styles.skeletonSectionTitle} />
+          <SkeletonBlock style={styles.skeletonUserCard} />
+        </View>
       </View>
     );
   }
@@ -254,13 +266,11 @@ export function ReportDetailScreen({ route, navigation }: any) {
   if (error || !report) {
     return (
       <View style={styles.centered}>
-        <ErrorMessage message={error ?? 'Signalement introuvable.'} />
-        <Button
-          title="Réessayer"
-          variant="secondary"
-          containerStyle={styles.retryButton}
-          onPress={loadReport}
-        />
+        {error ? (
+          <ErrorMessage message={error} retryLabel="Réessayer" onRetry={loadReport} />
+        ) : (
+          <EmptyState title="Signalement introuvable" actionLabel="Retour" onAction={() => navigation.goBack()} />
+        )}
       </View>
     );
   }
@@ -501,6 +511,47 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: spacing.md,
+  },
+  skeletonRoot: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
+  skeletonGallery: {
+    width: '100%',
+    height: 292,
+    borderRadius: 0,
+  },
+  skeletonSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+  },
+  skeletonBadgeRow: {
+    width: 170,
+    height: 22,
+  },
+  skeletonMainTitle: {
+    width: '82%',
+    height: 28,
+    marginTop: spacing.md,
+  },
+  skeletonLineLong: {
+    width: '95%',
+    height: 14,
+    marginTop: spacing.sm,
+  },
+  skeletonParagraph: {
+    width: '100%',
+    height: 70,
+    marginTop: spacing.md,
+  },
+  skeletonSectionTitle: {
+    width: 100,
+    height: 18,
+    marginBottom: spacing.md,
+  },
+  skeletonUserCard: {
+    width: '100%',
+    height: 76,
   },
   gallerySection: {
     backgroundColor: colors.background.secondary,

@@ -1,10 +1,25 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { Button } from './Button';
 import { colors, spacing, typography } from '../../constants/theme';
 
-export function ErrorMessage({ message }: { message: string }) {
+interface ErrorMessageProps {
+  message: string;
+  retryLabel?: string;
+  onRetry?: () => void;
+}
+
+export function ErrorMessage({ message, retryLabel, onRetry }: ErrorMessageProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{message}</Text>
+      {retryLabel && onRetry ? (
+        <Button
+          title={retryLabel}
+          variant="secondary"
+          onPress={onRetry}
+          containerStyle={styles.retryButton}
+        />
+      ) : null}
     </View>
   );
 }
@@ -12,4 +27,5 @@ export function ErrorMessage({ message }: { message: string }) {
 const styles = StyleSheet.create({
   container: { backgroundColor: '#FEE2E2', borderColor: '#FCA5A5', borderWidth: 1, borderRadius: 10, padding: spacing.md },
   text: { ...typography.body, color: colors.danger },
+  retryButton: { marginTop: spacing.sm },
 });

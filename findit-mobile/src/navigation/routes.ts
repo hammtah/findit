@@ -1,6 +1,9 @@
 export const ROUTES = {
   LOGIN: 'Login',
   REGISTER: 'Register',
+  VERIFY_EMAIL: 'VerifyEmail',
+  FORGOT_PASSWORD: 'ForgotPassword',
+  RESET_PASSWORD: 'ResetPassword',
   FEED: 'Feed',
   FEED_HOME: 'FeedHome',
   REPORT_DETAIL: 'ReportDetail',

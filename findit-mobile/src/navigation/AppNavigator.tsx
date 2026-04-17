@@ -7,7 +7,7 @@ import { useChatStore } from '../store/chat.store';
 import { ConversationsListScreen } from '../screens/chat/ConversationsListScreen';
 import { ChatScreen } from '../screens/chat/ChatScreen';
 import { FeedScreen } from '../screens/feed/FeedScreen';
-import { ProfileStack } from './ProfileStack';
+import { ProfileStack } from './profileStack';
 import { CreateReportScreen } from '../screens/report/CreateReportScreen';
 import { ReportDetailScreen } from '../screens/report/ReportDetailScreen';
 import { ROUTES } from './routes';

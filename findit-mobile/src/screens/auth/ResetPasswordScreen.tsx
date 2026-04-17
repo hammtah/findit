@@ -7,7 +7,7 @@ import { borderRadius, colors, spacing, typography } from '../../constants/theme
 import { ROUTES } from '../../navigation/routes';
 import { AuthStackParamList } from '../../navigation/types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.REGISTER>;
+type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.RESET_PASSWORD>;
 
 export function ResetPasswordScreen({ navigation }: Props) {
   const [feedback, setFeedback] = useState<string | null>(null);

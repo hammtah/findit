@@ -6,7 +6,7 @@ import { borderRadius, colors, spacing, typography } from '../../constants/theme
 import { ROUTES } from '../../navigation/routes';
 import { AuthStackParamList } from '../../navigation/types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.REGISTER>;
+type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.VERIFY_EMAIL>;
 
 export function VerifyEmailScreen({ navigation }: Props) {
 
