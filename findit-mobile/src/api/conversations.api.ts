@@ -5,6 +5,7 @@ import { ConversationSummary, Message } from '../types/api.types';
 const unwrap = <T>(raw: unknown): T => (raw && typeof raw === 'object' && (raw as any).data ? (raw as any).data : raw) as T;
 
 export const conversationsApi = {
+
   createConversation: async (reportId: string): Promise<{ id: string }> =>
     (await apiClient.post<{ id: string }>('/conversations', { report_id: reportId })).data,
 

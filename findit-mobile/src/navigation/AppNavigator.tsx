@@ -20,7 +20,11 @@ const ConversationsStack = createNativeStackNavigator<ConversationsStackParamLis
 function FeedStackNavigator() {
   return (
     <FeedStack.Navigator>
-      <FeedStack.Screen name={ROUTES.FEED} component={FeedScreen} options={{ title: 'FindIt' }} />
+      <FeedStack.Screen
+        name={ROUTES.FEED_HOME}
+        component={FeedScreen}
+        options={{ title: 'FindIt' }}
+      />
       <FeedStack.Screen name={ROUTES.REPORT_DETAIL} component={ReportDetailScreen} options={{ title: 'Detail' }} />
     </FeedStack.Navigator>
   );

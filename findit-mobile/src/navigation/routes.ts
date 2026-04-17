@@ -5,6 +5,7 @@ export const ROUTES = {
   FORGOT_PASSWORD: 'ForgotPassword',
   RESET_PASSWORD: 'ResetPassword',
   FEED: 'Feed',
+  FEED_HOME: 'FeedHome',
   REPORT_DETAIL: 'ReportDetail',
   CREATE_REPORT: 'CreateReport',
   CONVERSATIONS: 'Conversations',
