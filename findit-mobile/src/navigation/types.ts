@@ -14,6 +14,11 @@ export type FeedStackParamList = {
   [ROUTES.USER_PUBLIC_PROFILE]: { userId: string } | undefined;
 };
 
+export type ConversationsStackParamList = {
+  [ROUTES.CONVERSATIONS]: undefined;
+  [ROUTES.CHAT]: { conversationId: string };
+};
+
 export type AppTabParamList = {
   [ROUTES.FEED]: undefined;
   [ROUTES.CREATE_REPORT]: undefined;

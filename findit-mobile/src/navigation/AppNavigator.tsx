@@ -3,16 +3,19 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { colors } from '../constants/theme';
-import { ConversationsScreen } from '../screens/chat/ConversationsScreen';
+import { useChatStore } from '../store/chat.store';
+import { ConversationsListScreen } from '../screens/chat/ConversationsListScreen';
+import { ChatScreen } from '../screens/chat/ChatScreen';
 import { FeedScreen } from '../screens/feed/FeedScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { CreateReportScreen } from '../screens/report/CreateReportScreen';
 import { ReportDetailScreen } from '../screens/report/ReportDetailScreen';
 import { ROUTES } from './routes';
-import { AppTabParamList, FeedStackParamList } from './types';
+import { AppTabParamList, ConversationsStackParamList, FeedStackParamList } from './types';
 
 const Tabs = createBottomTabNavigator<AppTabParamList>();
 const FeedStack = createNativeStackNavigator<FeedStackParamList>();
+const ConversationsStack = createNativeStackNavigator<ConversationsStackParamList>();
 
 function FeedStackNavigator() {
   return (
@@ -23,7 +26,18 @@ function FeedStackNavigator() {
   );
 }
 
+function ConversationsStackNavigator() {
+  return (
+    <ConversationsStack.Navigator initialRouteName={ROUTES.CONVERSATIONS} screenOptions={{ headerShown: false }}>
+      <ConversationsStack.Screen name={ROUTES.CONVERSATIONS} component={ConversationsListScreen} />
+      <ConversationsStack.Screen name={ROUTES.CHAT} component={ChatScreen} />
+    </ConversationsStack.Navigator>
+  );
+}
+
 export function AppNavigator() {
+  const totalUnread = useChatStore((s) => s.getTotalUnread());
+
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({
@@ -42,7 +56,14 @@ export function AppNavigator() {
     >
       <Tabs.Screen name={ROUTES.FEED} component={FeedStackNavigator} options={{ title: 'Feed' }} />
       <Tabs.Screen name={ROUTES.CREATE_REPORT} component={CreateReportScreen} options={{ title: 'Creer' }} />
-      <Tabs.Screen name={ROUTES.CONVERSATIONS} component={ConversationsScreen} options={{ title: 'Conversations' }} />
+      <Tabs.Screen
+        name={ROUTES.CONVERSATIONS}
+        component={ConversationsStackNavigator}
+        options={{
+          title: 'Messages',
+          tabBarBadge: totalUnread > 0 ? totalUnread : undefined,
+        }}
+      />
       <Tabs.Screen name={ROUTES.PROFILE} component={ProfileScreen} options={{ title: 'Profil' }} />
     </Tabs.Navigator>
   );

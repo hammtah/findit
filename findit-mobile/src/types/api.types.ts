@@ -1,69 +1,102 @@
-/*
-    This file defines TypeScript interfaces for the API responses and data models used in the FindIt mobile application.
-*/
 export interface User {
   id: string;
+  nom: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  avatar?: string;
-  phoneNumber?: string;
-  isVerified: boolean;
+  photo_url: string | null;
+  note_fiabilite: number | null;
+  date_inscription: string;
+  nb_objets_resolus: number;
 }
 
 export interface ReportSummary {
   id: string;
-  title: string;
-  description: string;
-  createdAt: Date;
-  status: 'OPEN' | 'CLOSED' | 'RESOLVED';
-  isLost: boolean;
-  user: Pick<User, 'id' | 'firstName' | 'avatar'>;
+  type: 'lost' | 'found';
+  titre: string;
+  categorie: string;
+  statut: 'en_attente' | 'resolu' | 'rendu';
+  adresse: string;
+  distance_meters: number;
+  first_photo_url: string | null;
+  date_evenement: string;
+  created_at: string;
+  user: { nom: string; photo_url: string | null };
+}
+
+export interface MatchSuggestion {
+  match_id: string;
+  score: number;
+  report: {
+    id: string;
+    titre: string;
+    adresse: string;
+    categorie: string;
+    first_photo_url: string | null;
+    date_evenement: string;
+    distance_meters: number;
+    user: { nom: string; note_fiabilite: number | null };
+  };
 }
 
 export interface ReportDetail extends ReportSummary {
-  location: {
-    latitude: number;
-    longitude: number;
+  description: string;
+  photos: string[];
+  heure_evenement: string | null;
+  updated_at: string;
+  user: {
+    id: string;
+    nom: string;
+    photo_url: string | null;
+    note_fiabilite: number | null;
   };
-  images: string[];
-  flags: any[];
+  matches?: MatchSuggestion[];
+  my_conversation_id?: string | null;
 }
 
 export interface ConversationSummary {
   id: string;
-  lastMessage: Message;
-  participants: User[];
-  report: Pick<ReportSummary, 'id' | 'title'>;
-  updatedAt: Date;
-  statut?: string; 
-  unread_count?: number; 
+  statut: 'en_attente' | 'active' | 'refusee' | 'archivee' | 'lecture_seule';
+  report_lost: { id: string; titre: string };
+  report_found?: { id: string; titre: string };
+  other_user: { id: string; nom: string; photo_url: string | null };
+  last_message: { contenu: string; created_at: string; is_read: boolean } | null;
+  unread_count: number;
+  expires_at: string | null;
+  receiver_id?: string;
 }
 
 export interface Message {
   id: string;
-  content: string;
-  createdAt: Date;
-  sender: Pick<User, 'id' | 'firstName' | 'avatar'>;
-  conversationId: string;
+  conversation_id: string;
+  sender_id: string;
+  contenu: string;
+  photo_url: string | null;
+  is_read: boolean;
+  created_at: string;
 }
 
 export interface Review {
   id: string;
-  rating: number;
-  comment: string;
-  createdAt: Date;
-  reviewer: Pick<User, 'id' | 'firstName' | 'avatar'>;
-  reviewee: Pick<User, 'id' | 'firstName'>;
+  note: number;
+  commentaire: string | null;
+  reviewer: { nom: string; photo_url: string | null };
+  created_at: string;
 }
 
 export interface ApiError {
-  statusCode: number;
-  message: string | string[];
-  error: string;
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    statusCode: number;
+  };
 }
 
 export interface ApiSuccess<T> {
+  success: true;
   data: T;
-  message?: string;
+  meta?: {
+    total: number;
+    page: number;
+    last_page: number;
+  };
 }
