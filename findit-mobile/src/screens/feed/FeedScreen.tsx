@@ -80,12 +80,19 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <Text style={styles.headerTitle}>FindIt</Text>
-      <Pressable style={styles.filterIconWrapper} onPress={() => setIsFilterSheetOpen(true)}>
+      <Text style={styles.headerTitle} allowFontScaling minimumFontScale={0.9}>FindIt</Text>
+      <Pressable
+        style={styles.filterIconWrapper}
+        onPress={() => setIsFilterSheetOpen(true)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Ouvrir les filtres"
+        accessibilityHint="Personnaliser la liste des signalements"
+      >
         <Ionicons name="options" size={22} color={colors.text.primary} />
         {filters.activeFiltersCount > 0 && (
           <View style={styles.filterBadge}>
-            <Text style={styles.filterBadgeText}>{filters.activeFiltersCount}</Text>
+            <Text style={styles.filterBadgeText} allowFontScaling minimumFontScale={0.9}>{filters.activeFiltersCount}</Text>
           </View>
         )}
       </Pressable>
@@ -168,7 +175,7 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
           <View style={styles.modalBackdrop}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Activer la géolocalisation</Text>
-              <Text style={styles.modalText}>
+              <Text style={styles.modalText} allowFontScaling minimumFontScale={0.9}>
                 FindIt utilise votre position pour afficher les objets perdus et trouvés à proximité.
                 Votre localisation est utilisée uniquement pour ce service.
               </Text>

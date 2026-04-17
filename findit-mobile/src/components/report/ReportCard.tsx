@@ -41,9 +41,17 @@ export function ReportCard({ report, onPress }: ReportCardProps) {
       : colors.text.muted;
 
   const categoryColor = colors.categories[report.categorie as keyof typeof colors.categories] ?? colors.categories.autre;
+  const accessibilitySummary = `${report.titre}. ${statusLabel}. ${distance}. ${report.adresse}.`;
 
   return (
-    <Pressable style={styles.container} onPress={onPress}>
+    <Pressable
+      style={styles.container}
+      onPress={onPress}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilitySummary}
+      accessibilityHint="Ouvrir le detail du signalement"
+    >
       <View style={styles.row}>
         <View style={styles.imageContainer}>
           {report.first_photo_url ? (
@@ -55,14 +63,14 @@ export function ReportCard({ report, onPress }: ReportCardProps) {
             />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
-              <Text style={styles.placeholderEmoji}>{category?.icon ?? '📦'}</Text>
+              <Text style={styles.placeholderEmoji} allowFontScaling={false}>{category?.icon ?? '📦'}</Text>
             </View>
           )}
         </View>
 
         <View style={styles.content}>
           <View style={styles.titleRow}>
-            <Text numberOfLines={2} style={styles.title}>
+            <Text numberOfLines={2} style={styles.title} allowFontScaling minimumFontScale={0.9}>
               {report.titre}
             </Text>
           </View>
@@ -70,16 +78,16 @@ export function ReportCard({ report, onPress }: ReportCardProps) {
           <View style={styles.metaRow}>
             {category ? (
               <View style={[styles.badge, { backgroundColor: categoryColor }]}>
-                <Text style={styles.badgeText}>{category.label}</Text>
+                <Text style={styles.badgeText} allowFontScaling minimumFontScale={0.9}>{category.label}</Text>
               </View>
             ) : null}
           </View>
 
-          <Text style={styles.subline} numberOfLines={1}>
+          <Text style={styles.subline} numberOfLines={1} allowFontScaling minimumFontScale={0.9}>
             {distance} · {created}
           </Text>
 
-          <Text style={styles.address} numberOfLines={1}>
+          <Text style={styles.address} numberOfLines={1} allowFontScaling minimumFontScale={0.9}>
             {report.adresse}
           </Text>
         </View>
@@ -94,7 +102,7 @@ export function ReportCard({ report, onPress }: ReportCardProps) {
             },
           ]}
         >
-          <Text style={[styles.statusText, { color: statusColor }]}>{statusLabel}</Text>
+          <Text style={[styles.statusText, { color: statusColor }]} allowFontScaling minimumFontScale={0.9}>{statusLabel}</Text>
         </View>
       </View>
     </Pressable>

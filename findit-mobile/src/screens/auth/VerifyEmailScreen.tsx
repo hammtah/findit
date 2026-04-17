@@ -12,14 +12,19 @@ export function VerifyEmailScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.illustration}>📨</Text>
-      <Text style={styles.title}>Inscription terminee</Text>
-      <Text style={styles.description}>
+      <Text style={styles.illustration} allowFontScaling={false}>📨</Text>
+      <Text style={styles.title} allowFontScaling minimumFontScale={0.9}>Inscription terminee</Text>
+      <Text style={styles.description} allowFontScaling minimumFontScale={0.9}>
         Votre compte est actif immediatement. Connectez-vous pour continuer.
       </Text>
       <Button title="Aller a la connexion" onPress={() => navigation.navigate(ROUTES.LOGIN)} />
-      <Pressable onPress={() => navigation.navigate(ROUTES.LOGIN)}>
-        <Text style={styles.link}>Revenir a la connexion</Text>
+      <Pressable
+        onPress={() => navigation.navigate(ROUTES.LOGIN)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Revenir a la connexion"
+      >
+        <Text style={styles.link} allowFontScaling minimumFontScale={0.9}>Revenir a la connexion</Text>
       </Pressable>
     </View>
   );

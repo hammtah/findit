@@ -13,8 +13,18 @@ export function OAuthButton({
   const label = provider === 'google' ? 'Continuer avec Google' : 'Continuer avec Apple';
 
   return (
-    <Pressable onPress={onPress} style={[styles.button, disabled && styles.disabled]} disabled={disabled}>
-      <Text style={styles.label}>{label}</Text>
+    <Pressable
+      onPress={onPress}
+      style={[styles.button, disabled && styles.disabled]}
+      disabled={disabled}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={`Se connecter via ${provider === 'google' ? 'Google' : 'Apple'}`}
+    >
+      <Text style={styles.label} allowFontScaling minimumFontScale={0.9}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

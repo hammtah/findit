@@ -71,7 +71,7 @@ export function RegisterScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Inscription</Text>
+      <Text style={styles.title} allowFontScaling minimumFontScale={0.9}>Inscription</Text>
       <View style={styles.form}>
         <Controller
           control={control}
@@ -127,10 +127,20 @@ export function RegisterScreen({ navigation }: Props) {
           )}
         />
 
-        {submitError ? <Text style={styles.errorText}>{submitError}</Text> : null}
-        <Button title="Creer mon compte" onPress={onSubmit} disabled={isSubmitting} />
-        <Pressable onPress={() => navigation.navigate(ROUTES.LOGIN)}>
-          <Text style={styles.link}>J'ai deja un compte</Text>
+        {submitError ? <Text style={styles.errorText} allowFontScaling minimumFontScale={0.9}>{submitError}</Text> : null}
+        <Button
+          title="Creer mon compte"
+          onPress={onSubmit}
+          disabled={isSubmitting}
+          accessibilityHint="Soumettre le formulaire d'inscription"
+        />
+        <Pressable
+          onPress={() => navigation.navigate(ROUTES.LOGIN)}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Retour a la connexion"
+        >
+          <Text style={styles.link} allowFontScaling minimumFontScale={0.9}>J'ai deja un compte</Text>
         </Pressable>
       </View>
       {isSubmitting ? <LoadingOverlay /> : null}

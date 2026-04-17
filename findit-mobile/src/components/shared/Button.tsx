@@ -6,15 +6,34 @@ interface ButtonProps extends PressableProps {
   title: string;
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   containerStyle?: StyleProp<ViewStyle>;
+  accessibilityHint?: string;
 }
 
-export function Button({ title, variant = 'primary', containerStyle, ...rest }: ButtonProps) {
+export function Button({
+  title,
+  variant = 'primary',
+  containerStyle,
+  accessibilityLabel,
+  accessibilityHint,
+  accessibilityRole,
+  ...rest
+}: ButtonProps) {
   return (
     <Pressable
       {...rest}
+      accessible={true}
+      accessibilityRole={accessibilityRole ?? 'button'}
+      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityHint={accessibilityHint}
       style={({ pressed }) => [styles.base, styles[variant], pressed && styles.pressed, containerStyle]}
     >
-      <Text style={[styles.label, variant === 'ghost' && styles.labelGhost]}>{title}</Text>
+      <Text
+        style={[styles.label, variant === 'ghost' && styles.labelGhost]}
+        allowFontScaling
+        minimumFontScale={0.9}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 }

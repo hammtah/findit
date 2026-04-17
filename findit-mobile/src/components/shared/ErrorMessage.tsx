@@ -10,8 +10,8 @@ interface ErrorMessageProps {
 
 export function ErrorMessage({ message, retryLabel, onRetry }: ErrorMessageProps) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{message}</Text>
+    <View style={styles.container} accessible={true} accessibilityRole="alert">
+      <Text style={styles.text} allowFontScaling minimumFontScale={0.9}>{message}</Text>
       {retryLabel && onRetry ? (
         <Button
           title={retryLabel}

@@ -146,8 +146,8 @@ export function LoginScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.logo}>FindIt</Text>
-        <Text style={styles.tagline}>Retrouvez ce qui compte, autour de vous.</Text>
+        <Text style={styles.logo} allowFontScaling minimumFontScale={0.9}>FindIt</Text>
+        <Text style={styles.tagline} allowFontScaling minimumFontScale={0.9}>Retrouvez ce qui compte, autour de vous.</Text>
       </View>
 
       <View style={styles.form}>
@@ -183,12 +183,17 @@ export function LoginScreen({ navigation }: Props) {
           )}
         />
 
-        {submitError ? <Text style={styles.errorText}>{submitError}</Text> : null}
-        <Button title="Se connecter" onPress={onSubmit} disabled={isBusy} />
+        {submitError ? <Text style={styles.errorText} allowFontScaling minimumFontScale={0.9}>{submitError}</Text> : null}
+        <Button
+          title="Se connecter"
+          onPress={onSubmit}
+          disabled={isBusy}
+          accessibilityHint="Soumettre le formulaire de connexion"
+        />
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.separator}>ou</Text>
+        <Text style={styles.separator} allowFontScaling minimumFontScale={0.9}>ou</Text>
         {isGoogleConfigured ? (
           <GoogleOAuthButton
             onAuthStart={() => {
@@ -206,8 +211,13 @@ export function LoginScreen({ navigation }: Props) {
           />
         )}
         {Platform.OS === 'ios' ? <OAuthButton provider="apple" onPress={handleApplePress} /> : null}
-        <Pressable onPress={() => navigation.navigate(ROUTES.REGISTER)}>
-          <Text style={styles.link}>Pas de compte ? Creer un compte</Text>
+        <Pressable
+          onPress={() => navigation.navigate(ROUTES.REGISTER)}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Aller a l'inscription"
+        >
+          <Text style={styles.link} allowFontScaling minimumFontScale={0.9}>Pas de compte ? Creer un compte</Text>
         </Pressable>
       </View>
 

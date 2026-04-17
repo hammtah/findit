@@ -17,14 +17,19 @@ export function ResetPasswordScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reinitialiser le mot de passe</Text>
-      <Text style={styles.caption}>Cette action n'est pas disponible dans ce flow d'authentification.</Text>
+      <Text style={styles.title} allowFontScaling minimumFontScale={0.9}>Reinitialiser le mot de passe</Text>
+      <Text style={styles.caption} allowFontScaling minimumFontScale={0.9}>Cette action n'est pas disponible dans ce flow d'authentification.</Text>
 
-      {feedback ? <Text style={styles.feedback}>{feedback}</Text> : null}
+      {feedback ? <Text style={styles.feedback} allowFontScaling minimumFontScale={0.9}>{feedback}</Text> : null}
 
       <Button title="Compris" onPress={onSubmit} />
-      <Pressable onPress={() => navigation.navigate(ROUTES.LOGIN)}>
-        <Text style={styles.link}>Retour a la connexion</Text>
+      <Pressable
+        onPress={() => navigation.navigate(ROUTES.LOGIN)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Retour a la connexion"
+      >
+        <Text style={styles.link} allowFontScaling minimumFontScale={0.9}>Retour a la connexion</Text>
       </Pressable>
     </View>
   );

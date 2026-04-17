@@ -20,8 +20,20 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ match, onPress }: MatchCardProps) {
+  const distanceLabel =
+    match.distance_meters === null
+      ? match.report_found.adresse
+      : formatDistance(match.distance_meters);
+
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable
+      style={styles.card}
+      onPress={onPress}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={`${match.report_found.titre}. Similarite ${Math.round(match.score)} pour cent. ${distanceLabel}.`}
+      accessibilityHint="Ouvrir ce signalement similaire"
+    >
       <View style={styles.imageWrapper}>
         {match.report_found.first_photo_url ? (
           <Image
@@ -31,18 +43,18 @@ export function MatchCard({ match, onPress }: MatchCardProps) {
           />
         ) : (
           <View style={[styles.image, styles.placeholder]}>
-            <Text style={styles.placeholderText}>📦</Text>
+            <Text style={styles.placeholderText} allowFontScaling={false}>📦</Text>
           </View>
         )}
         <View style={styles.scoreBadge}>
-          <Text style={styles.scoreText}>{Math.round(match.score)}%</Text>
+          <Text style={styles.scoreText} allowFontScaling minimumFontScale={0.9}>{Math.round(match.score)}%</Text>
         </View>
       </View>
-      <Text style={styles.title} numberOfLines={2}>
+      <Text style={styles.title} numberOfLines={2} allowFontScaling minimumFontScale={0.9}>
         {match.report_found.titre}
       </Text>
-      <Text style={styles.caption} numberOfLines={1}>
-        {match.distance_meters === null ? match.report_found.adresse : formatDistance(match.distance_meters)}
+      <Text style={styles.caption} numberOfLines={1} allowFontScaling minimumFontScale={0.9}>
+        {distanceLabel}
       </Text>
     </Pressable>
   );

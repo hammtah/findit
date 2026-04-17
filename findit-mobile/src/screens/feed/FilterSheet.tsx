@@ -24,15 +24,20 @@ export function FilterSheet({ visible, onClose }: FilterSheetProps) {
         <Pressable style={styles.backdropPressable} onPress={onClose} />
         <View style={styles.sheet}>
           <View style={styles.header}>
-            <Text style={styles.title}>Filtres</Text>
-            <Pressable onPress={onClose} accessibilityRole="button">
+            <Text style={styles.title} allowFontScaling minimumFontScale={0.9}>Filtres</Text>
+            <Pressable
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Fermer les filtres"
+              accessibilityHint="Ferme le panneau de filtres"
+            >
               <Ionicons name="close" size={22} color={colors.text.primary} />
             </Pressable>
           </View>
 
           <ScrollView contentContainerStyle={styles.content}>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Type</Text>
+              <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Type</Text>
               <View style={styles.rowWrap}>
                 <Chip
                   label="Perdu"
@@ -53,7 +58,7 @@ export function FilterSheet({ visible, onClose }: FilterSheetProps) {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Rayon</Text>
+              <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Rayon</Text>
               <View style={styles.rowWrap}>
                 {[1000, 5000, 10000, 25000, 50000].map((value) => (
                   <Chip
@@ -67,7 +72,7 @@ export function FilterSheet({ visible, onClose }: FilterSheetProps) {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Catégorie</Text>
+              <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Catégorie</Text>
               <View style={styles.rowWrap}>
                 <Chip
                   label="Toutes"
@@ -86,7 +91,7 @@ export function FilterSheet({ visible, onClose }: FilterSheetProps) {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Période</Text>
+              <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Période</Text>
               <View style={styles.rowWrap}>
                 <Chip
                   label="Aujourd'hui"
@@ -112,7 +117,7 @@ export function FilterSheet({ visible, onClose }: FilterSheetProps) {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Statut</Text>
+              <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Statut</Text>
               <View style={styles.rowWrap}>
                 <Chip
                   label="En attente"
@@ -163,12 +168,17 @@ function Chip({ label, selected, onPress }: ChipProps) {
   return (
     <Pressable
       onPress={onPress}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={selected ? 'Filtre deja active' : 'Activer ce filtre'}
+      accessibilityState={{ selected }}
       style={[
         styles.chip,
         selected && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
       ]}
     >
-      <Text style={[styles.chipLabel, selected && { color: colors.primary }]}>{label}</Text>
+      <Text style={[styles.chipLabel, selected && { color: colors.primary }]} allowFontScaling minimumFontScale={0.9}>{label}</Text>
     </Pressable>
   );
 }

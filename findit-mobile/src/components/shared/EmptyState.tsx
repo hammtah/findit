@@ -11,10 +11,10 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.illustration}>📭</Text>
-      <Text style={styles.title}>{title}</Text>
-      {description ? <Text style={styles.description}>{description}</Text> : null}
+    <View style={styles.container} accessible={true} accessibilityRole="summary">
+      <Text style={styles.illustration} allowFontScaling={false}>📭</Text>
+      <Text style={styles.title} allowFontScaling minimumFontScale={0.9}>{title}</Text>
+      {description ? <Text style={styles.description} allowFontScaling minimumFontScale={0.9}>{description}</Text> : null}
       {actionLabel && onAction ? (
         <Button
           title={actionLabel}

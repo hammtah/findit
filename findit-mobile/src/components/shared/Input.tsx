@@ -11,14 +11,25 @@ interface InputProps extends TextInputProps {
 export const Input = forwardRef<TextInput, InputProps>(({ label, error, style, ...rest }, ref) => {
   return (
     <View style={styles.container}>
-      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {label ? (
+        <Text style={styles.label} allowFontScaling minimumFontScale={0.9}>
+          {label}
+        </Text>
+      ) : null}
       <TextInput
         ref={ref}
         style={[styles.input, error ? styles.inputError : undefined, style]}
         placeholderTextColor={colors.text.muted}
+        accessible={true}
+        accessibilityLabel={rest.accessibilityLabel ?? label}
+        accessibilityHint={rest.accessibilityHint}
         {...rest}
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? (
+        <Text style={styles.error} allowFontScaling minimumFontScale={0.9}>
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 });
