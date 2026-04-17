@@ -7,7 +7,7 @@ import { useChatStore } from '../store/chat.store';
 import { ConversationsListScreen } from '../screens/chat/ConversationsListScreen';
 import { ChatScreen } from '../screens/chat/ChatScreen';
 import { FeedScreen } from '../screens/feed/FeedScreen';
-import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { ProfileStack } from './ProfileStack';
 import { CreateReportScreen } from '../screens/report/CreateReportScreen';
 import { ReportDetailScreen } from '../screens/report/ReportDetailScreen';
 import { ROUTES } from './routes';
@@ -68,7 +68,7 @@ export function AppNavigator() {
           tabBarBadge: totalUnread > 0 ? totalUnread : undefined,
         }}
       />
-      <Tabs.Screen name={ROUTES.PROFILE} component={ProfileScreen} options={{ title: 'Profil' }} />
+      <Tabs.Screen name={ROUTES.PROFILE} component={ProfileStack} options={{ title: 'Profil' }} />
     </Tabs.Navigator>
   );
 }
