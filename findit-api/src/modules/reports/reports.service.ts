@@ -57,9 +57,9 @@ export class ReportsService {
     }
 
     user.reports_count += 1;
-    const moderationThreshold =
-      this.configService.get<number>('app.moderationNewUserReports') ?? 3;
-    const moderationPending = user.reports_count <= moderationThreshold;
+    // const moderationThreshold =
+    //   this.configService.get<number>('app.moderationNewUserReports') ?? 3;
+    // const moderationPending = user.reports_count <= moderationThreshold;
 
     const reportToCreate = this.reportsRepository.create();
     reportToCreate.user_id = userId;
@@ -71,8 +71,10 @@ export class ReportsService {
     reportToCreate.heure_evenement = dto.heure_evenement ?? null;
     reportToCreate.adresse = dto.adresse;
     reportToCreate.photos = photos;
-    reportToCreate.moderation_pending = moderationPending;
-    reportToCreate.is_visible = !moderationPending;
+    // reportToCreate.moderation_pending = moderationPending;
+    // reportToCreate.is_visible = !moderationPending;
+    reportToCreate.moderation_pending = false;
+    reportToCreate.is_visible = true;
 
     const report = await this.reportsRepository.save(reportToCreate);
 

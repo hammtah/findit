@@ -22,11 +22,11 @@ interface FiltersState extends BaseFilters {
 }
 
 const defaults: BaseFilters = {
-  type: 'lost',
-  radius: 10000,
+  type: 'all',
+  radius: 50000,
   categorie: null,
   dateRange: 'all',
-  statut: 'en_attente',
+  statut: 'all',
 };
 
 const getCount = (f: BaseFilters) =>
