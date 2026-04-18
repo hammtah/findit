@@ -70,8 +70,8 @@ export function RootNavigator() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      {/* {isLoading ? <SplashScreen /> : isAuthenticated ? <AppNavigator /> : <AuthNavigator />} */}
-      <AppNavigator />
+      {isLoading ? <SplashScreen /> : isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
+      {/* <AppNavigator /> */}
     </NavigationContainer>
   );
 }
