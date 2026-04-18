@@ -36,7 +36,8 @@ import { UsersModule } from './modules/users/users.module';
         password: config.get('database.password'),
         database: config.get('database.name'),
         autoLoadEntities: true,
-        synchronize: config.get('app.devMode'), // only synchronize in dev mode
+        // synchronize: config.get('app.devMode'), // only synchronize in dev mode
+        synchronize: true,
         migrations: ['dist/database/migrations/*.js'],
         migrationsRun: false,
       }),
