@@ -8,7 +8,10 @@ import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../navigation/routes';
 import { useInfiniteReports } from '../../hooks/useInfiniteReports';
 
-export function MapScreen() {
+ const LOST_PLACEHOLDER = require('../../../assets/icon.png');
+ const FOUND_PLACEHOLDER = require('../../../assets/adaptive-icon.png');
+
+ export function MapScreen() {
   const { reports, refresh, isLoading, error } = useInfiniteReports();
 
   useEffect(() => {
@@ -66,12 +69,12 @@ export function MapScreen() {
       latitude: report.latitude as number,
       longitude: report.longitude as number,
       title: report.titre,
-      description: report.description,
+      description: report.adresse,
       color: report.type === 'lost' ? colors.danger : colors.secondary,
+      imageSource: report.type === 'lost' ? LOST_PLACEHOLDER : FOUND_PLACEHOLDER,
       onPress: () => {
-        navigation.navigate(ROUTES.FEED, {
-          screen: ROUTES.REPORT_DETAIL,
-          params: { reportId: report.id },
+        navigation.navigate(ROUTES.REPORT_DETAIL, {
+          reportId: report.id,
         });
       }
     }));

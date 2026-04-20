@@ -14,4 +14,5 @@ export const ROUTES = {
   PROFILE: 'Profile',
   USER_PUBLIC_PROFILE: 'UserPublicProfile',
   MAP: 'Map',
+  MAP_HOME: 'MapHome',
 } as const;
