@@ -31,4 +31,5 @@ export type AppTabParamList = {
     | undefined;
   [ROUTES.CONVERSATIONS]: undefined;
   [ROUTES.PROFILE]: undefined;
+  [ROUTES.MAP]: undefined;
 };

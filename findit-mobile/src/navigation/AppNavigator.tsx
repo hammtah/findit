@@ -10,6 +10,7 @@ import { FeedScreen } from '../screens/feed/FeedScreen';
 import { ProfileStack } from './profileStack';
 import { CreateReportScreen } from '../screens/report/CreateReportScreen';
 import { ReportDetailScreen } from '../screens/report/ReportDetailScreen';
+import { MapScreen } from '../screens/map/MapScreen';
 import { ROUTES } from './routes';
 import { AppTabParamList, ConversationsStackParamList, FeedStackParamList } from './types';
 
@@ -50,6 +51,7 @@ export function AppNavigator() {
         tabBarIcon: ({ color, size }) => {
           const map: Record<string, keyof typeof Ionicons.glyphMap> = {
             [ROUTES.FEED]: 'list',
+            [ROUTES.MAP]: 'map',
             [ROUTES.CREATE_REPORT]: 'add-circle',
             [ROUTES.CONVERSATIONS]: 'chatbubble-ellipses',
             [ROUTES.PROFILE]: 'person',
@@ -59,6 +61,7 @@ export function AppNavigator() {
       })}
     >
       <Tabs.Screen name={ROUTES.FEED} component={FeedStackNavigator} options={{ title: 'Feed' }} />
+      <Tabs.Screen name={ROUTES.MAP} component={MapScreen} options={{ title: 'Carte' }} />
       <Tabs.Screen name={ROUTES.CREATE_REPORT} component={CreateReportScreen} options={{ title: 'Creer' }} />
       <Tabs.Screen
         name={ROUTES.CONVERSATIONS}

@@ -17,13 +17,20 @@
       "supportsTablet": true,
       "associatedDomains": [
         "applinks:findit.app"
-      ]
+      ],
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "L'application a besoin de votre position pour afficher les objets perdus/trouvés autour de vous."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",
@@ -49,7 +56,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-location"
     ]
   }
 }

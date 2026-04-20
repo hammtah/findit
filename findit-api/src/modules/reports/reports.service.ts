@@ -136,6 +136,8 @@ export class ReportsService {
       .addSelect('r.photos', 'photos')
       .addSelect('r.date_evenement', 'date_evenement')
       .addSelect('r.created_at', 'created_at')
+      .addSelect('ST_Y(r.location::geometry)', 'latitude')
+      .addSelect('ST_X(r.location::geometry)', 'longitude')
       .addSelect('u.nom', 'user_nom')
       .addSelect('u.photo_url', 'user_photo')
       .addSelect(
@@ -184,6 +186,8 @@ export class ReportsService {
         date_evenement: string;
         created_at: Date;
         distance_meters: string;
+        latitude: string | null;
+        longitude: string | null;
         user_nom: string;
         user_photo: string | null;
       }>();
@@ -200,6 +204,8 @@ export class ReportsService {
         first_photo_url: row.photos?.[0] ?? null,
         date_evenement: row.date_evenement,
         created_at: row.created_at,
+        latitude: row.latitude !== null ? Number.parseFloat(row.latitude) : undefined,
+        longitude: row.longitude !== null ? Number.parseFloat(row.longitude) : undefined,
         user: {
           nom: row.user_nom,
           photo_url: row.user_photo,
@@ -547,6 +553,8 @@ export class ReportsService {
         ? await this.computeReliability(user.id)
         : userNoteFiabilite;
 
+    const coordinates = await this.getReportCoordinates(report.id);
+
     return {
       id: report.id,
       type: report.type,
@@ -559,6 +567,8 @@ export class ReportsService {
       date_evenement: report.date_evenement,
       heure_evenement: report.heure_evenement,
       created_at: report.created_at,
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
       user: {
         id: user.id,
         nom: user.nom,
@@ -567,6 +577,28 @@ export class ReportsService {
       },
       matches: report.type === ReportType.LOST ? matches : [],
       my_conversation_id: myConversationId,
+    };
+  }
+
+  private async getReportCoordinates(reportId: string): Promise<{
+    latitude: number | null;
+    longitude: number | null;
+  }> {
+    const rows = await this.reportsRepository.query(
+      `SELECT ST_Y(location::geometry) AS latitude, ST_X(location::geometry) AS longitude
+       FROM reports
+       WHERE id = $1`,
+      [reportId],
+    );
+
+    const row = rows[0] as { latitude: string | null; longitude: string | null } | undefined;
+    if (!row || row.latitude === null || row.longitude === null) {
+      return { latitude: null, longitude: null };
+    }
+
+    return {
+      latitude: Number.parseFloat(row.latitude),
+      longitude: Number.parseFloat(row.longitude),
     };
   }
 }

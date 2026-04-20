@@ -1,22 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-
 import { reportsApi } from '../api/reports.api';
 import { useFiltersStore } from '../store/filters.store';
+import { useReportsStore, ReportSummary } from '../store/reports.store';
 import { useLocation } from './useLocation';
-
-interface ReportSummary {
-  id: string;
-  type: 'lost' | 'found';
-  titre: string;
-  categorie: string;
-  statut: string;
-  adresse: string;
-  distance_meters: number;
-  first_photo_url: string | null;
-  date_evenement: string;
-  created_at: string;
-  user: { nom: string; photo_url: string | null };
-}
 
 interface ReportsResponse {
   data: ReportSummary[];
@@ -40,8 +26,8 @@ interface UseInfiniteReportsResult {
 export function useInfiniteReports(): UseInfiniteReportsResult {
   const filters = useFiltersStore((state) => state);
   const location = useLocation();
+  const { reports, setReports, appendReports } = useReportsStore();
 
-  const [reports, setReports] = useState<ReportSummary[]>([]);
   const [page, setPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -72,8 +58,11 @@ export function useInfiniteReports(): UseInfiniteReportsResult {
 
       try {
         const response = await reportsApi.getReports<ReportsResponse>(params);
-        const nextReports = append ? [...reports, ...response.data] : response.data;
-        setReports(nextReports);
+        if (append) {
+          appendReports(response.data);
+        } else {
+          setReports(response.data);
+        }
         setPage(response.meta.page);
         setHasMore(response.meta.page < response.meta.last_page);
         setError(null);
@@ -89,7 +78,8 @@ export function useInfiniteReports(): UseInfiniteReportsResult {
       filters.categorie,
       location.coords,
       location.manualAddress,
-      reports,
+      appendReports,
+      setReports,
     ],
   );
 
@@ -113,7 +103,12 @@ export function useInfiniteReports(): UseInfiniteReportsResult {
     if (!location.coords && !location.manualAddress && location.permissionStatus !== 'denied') {
       return;
     }
-    refresh();
+    
+    // Only fetch if we don't have reports yet or if this is a filter/location change
+    // This addresses the user's concern about redundant requests between Feed and Map
+    if (reports.length === 0) {
+      refresh();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     location.coords?.latitude,
